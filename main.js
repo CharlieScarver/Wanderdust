@@ -10,30 +10,11 @@ var paused = false,
     cleanTicks = 30;
 
 var particlesToSpawn = 450;
+var maxIdleParticles = 100;
+var drawLinesInRadius = 60;
 var particles = [];
 var indexesToClean = [];
 var drawLinesBetween = [];
-
-function checkIfPointIsInsideACircle(centerX, centerY, pointX, pointY) {
-    var dx = Math.abs(pointX - centerX);
-    var dy = Math.abs(pointY - centerY);
-    var R = 60;
-
-    if (dx + dy <= R) {
-        return true;
-    }
-    if (dx > R) {
-        return false;
-    }
-    if (dy > R) {
-        return false;
-    }
-    if (Math.pow(dx, 2) + Math.pow(dy, 2) <= Math.pow(R, 2)) {
-        return true;
-    }
-
-    return false;
-}
 
 function update() {
     tick();
@@ -66,45 +47,46 @@ function tick() {
         ticksPassed = 0;
     }
 
-    // Spawning
+    // Spawning new particles
     if (particles.length < particlesToSpawn) {
         var randomX, randomY;
+        var canBeIdle = particles.length < maxIdleParticles;
 
         // Spawn five at a time to spawn faster
         randomX = Math.floor(Math.floor(Math.random() * 10000) % canvas.width);
         randomY = Math.floor(Math.floor(Math.random() * 10000) % canvas.height);
-        particles.push(new Particle(randomX, randomY));
+        particles.push(new Particle(randomX, randomY, canBeIdle));
 
         randomX = Math.floor(Math.floor(Math.random() * 10000) % canvas.width);
         randomY = Math.floor(Math.floor(Math.random() * 10000) % canvas.height);
-        particles.push(new Particle(randomX, randomY));
+        particles.push(new Particle(randomX, randomY, canBeIdle));
 
         randomX = Math.floor(Math.floor(Math.random() * 10000) % canvas.width);
         randomY = Math.floor(Math.floor(Math.random() * 10000) % canvas.height);
-        particles.push(new Particle(randomX, randomY));
+        particles.push(new Particle(randomX, randomY, canBeIdle));
 
         randomX = Math.floor(Math.floor(Math.random() * 10000) % canvas.width);
         randomY = Math.floor(Math.floor(Math.random() * 10000) % canvas.height);
-        particles.push(new Particle(randomX, randomY));
+        particles.push(new Particle(randomX, randomY, canBeIdle));
 
         randomX = Math.floor(Math.floor(Math.random() * 10000) % canvas.width);
         randomY = Math.floor(Math.floor(Math.random() * 10000) % canvas.height);
-        particles.push(new Particle(randomX, randomY));
+        particles.push(new Particle(randomX, randomY, canBeIdle));
     }
 
-    // Clear points which are outside.
+    // Clear particles which are outside
     particles = particles.filter(x => !x.isOutside);
 
-    // Update, mark for cleanup and mark near points
+    // Update, mark for cleanup and mark near particles
     particles.forEach(function (p, index) {
-        // update
+        // Update particles
         p.update(canvas.width, canvas.height);
-        // check for nearby points to draw lines
+        // Check for nearby particles to draw lines
         particles.forEach(function (p2, index2) {
             if (p.isOutside || index === index2) {
                 return;
             }
-            var isNear = checkIfPointIsInsideACircle(p.position.x, p.position.y, p2.position.x, p2.position.y);
+            var isNear = checkIfPointIsInsideACircle(p.position.x, p.position.y, p2.position.x, p2.position.y, drawLinesInRadius);
             if (isNear) {
                 drawLinesBetween.push({ from: index, to: index2 });
             }
@@ -114,23 +96,25 @@ function tick() {
     ticksPassed++;
 }
 
-
 function render(ctx) {
-
+    // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    // Background
     ctx.fillStyle = '#000000';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+    // Pause text
     if (paused) {
         ctx.fillStyle = '#FFFFFF';
         ctx.font = "40px Arial";
         ctx.fillText("Paused", canvas.width / 2 - 100, 250);
     }
 
+    // Draw the lines
     ctx.strokeStyle = '#FFFFFF';
     drawLinesBetween.forEach(function (o) {
-        // Lucky points get colored lines
+        // Lucky particles get colored lines
         if (particles[o.from].ID % 19 === 0) {
             ctx.strokeStyle = '#FF0000';
         }
@@ -161,13 +145,10 @@ function render(ctx) {
     });
     drawLinesBetween.clear();
 
-    // ------
-
+    // Render particles
     particles.forEach(function (p) {
         p.render(ctx);
     });
-
 }
-
 
 update();

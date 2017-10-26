@@ -1,7 +1,7 @@
-var Particle = (function () {
+var Particle = (function() {
     Particle.prototype.Count = 0;
 
-    function Particle(x, y) {
+    function Particle(x, y, canBeIdle) {
         this.ID = ++Particle.prototype.Count;
         this.position = {
             x: x,
@@ -24,11 +24,12 @@ var Particle = (function () {
         this.ticksPassed = 0;
 
         this.isOutside = false;
+        this.canBeIdle = canBeIdle;
 
         this.randomizeMovement();
     }
 
-    Particle.prototype.randomizeMovement = function () {
+    Particle.prototype.randomizeMovement = function() {
         this.movement = {
             left: false,
             right: false,
@@ -37,7 +38,7 @@ var Particle = (function () {
             idle: false
         };
 
-        var random = generateNumber(options.SpawnIdle ? 0 : 1, 12);
+        var random = generateNumber(Options.SpawnIdle && this.canBeIdle ? 0 : 1, 12);
 
         switch (random) {
             case 0:
@@ -81,7 +82,7 @@ var Particle = (function () {
         this.velocityY = Math.floor(Math.floor(Math.random() * 100) % this.maxVelocity) + this.minVelocity;
     }
 
-    Particle.prototype.update = function (width, height) {
+    Particle.prototype.update = function(width, height) {
         this.isOutside = false;
 
         if (this.position.x < 0 || this.position.x > width ||
@@ -89,12 +90,12 @@ var Particle = (function () {
             this.isOutside = true;
         }
 
-        // randomize stuff
+        // Randomize stuff
         if (this.ticksPassed === this.ticksNeededToChange) {
             this.ticksPassed = 0;
         }
 
-        // movement
+        // Movement
         if (this.movement.left) {
             this.position.x -= this.velocityX;
         }
@@ -108,12 +109,12 @@ var Particle = (function () {
             this.position.y += this.velocityY;
         }
 
-        // tick
+        // Tick
         this.ticksPassed++;
     };
 
 
-    Particle.prototype.render = function (ctx) {
+    Particle.prototype.render = function(ctx) {
         if (this.isOutside) {
             return;
         }
