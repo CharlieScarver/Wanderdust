@@ -1,4 +1,4 @@
-var Particle = (function() {
+var Particle = (function () {
     Particle.prototype.Count = 0;
 
     function Particle(x, y) {
@@ -17,10 +17,8 @@ var Particle = (function() {
 
         this.width = 1;
         this.height = 1;
-        this.minVelocity = 0;
+        this.minVelocity = 1;
         this.maxVelocity = 4;
-        this.velocityX = Math.floor(Math.floor(Math.random()*100) % this.maxVelocity) + this.minVelocity;
-        this.velocityY = Math.floor(Math.floor(Math.random()*100) % this.maxVelocity) + this.minVelocity;
 
         this.ticksNeededToChange = 100000;
         this.ticksPassed = 0;
@@ -28,10 +26,9 @@ var Particle = (function() {
         this.isOutside = false;
 
         this.randomizeMovement();
-        //console.log(this.ID);
     }
 
-    Particle.prototype.randomizeMovement = function() {
+    Particle.prototype.randomizeMovement = function () {
         this.movement = {
             left: false,
             right: false,
@@ -40,8 +37,12 @@ var Particle = (function() {
             idle: false
         };
 
-        var random = Math.floor(Math.floor(Math.random()*100) % 13);
+        var random = generateNumber(options.SpawnIdle ? 0 : 1, 12);
+
         switch (random) {
+            case 0:
+                this.movement.idle = true;
+                break;
             case 1:
                 this.movement.left = true;
                 break;
@@ -74,39 +75,36 @@ var Particle = (function() {
                 this.movement.right = true;
                 this.movement.down = true;
                 break;
-            case 0:
-                this.movement.idle = true;
         };
 
-        this.velocityX = Math.floor(Math.floor(Math.random()*100) % this.maxVelocity) + this.minVelocity;
-        this.velocityY = Math.floor(Math.floor(Math.random()*100) % this.maxVelocity) + this.minVelocity;
+        this.velocityX = Math.floor(Math.floor(Math.random() * 100) % this.maxVelocity) + this.minVelocity;
+        this.velocityY = Math.floor(Math.floor(Math.random() * 100) % this.maxVelocity) + this.minVelocity;
     }
 
-    Particle.prototype.update = function(width, height) {
+    Particle.prototype.update = function (width, height) {
+        this.isOutside = false;
+
         if (this.position.x < 0 || this.position.x > width ||
             this.position.y < 0 || this.position.y > height) {
             this.isOutside = true;
-            //console.log(this.ID + ' is out');
-            //return;
         }
 
         // randomize stuff
         if (this.ticksPassed === this.ticksNeededToChange) {
-            //this.randomizeMovement();
             this.ticksPassed = 0;
         }
 
         // movement
-        if(this.movement.left) {
+        if (this.movement.left) {
             this.position.x -= this.velocityX;
         }
-        if(this.movement.right) {
+        if (this.movement.right) {
             this.position.x += this.velocityX;
         }
-        if(this.movement.up) {
+        if (this.movement.up) {
             this.position.y -= this.velocityY;
         }
-        if(this.movement.down) {
+        if (this.movement.down) {
             this.position.y += this.velocityY;
         }
 
@@ -115,9 +113,9 @@ var Particle = (function() {
     };
 
 
-    Particle.prototype.render = function(ctx) {
-        if (this.isOutside) {  
-            return; 
+    Particle.prototype.render = function (ctx) {
+        if (this.isOutside) {
+            return;
         }
 
         ctx.fillStyle = '#FFFFFF'
