@@ -38,7 +38,7 @@ var Particle = (function() {
             idle: false
         };
 
-        var random = generateNumber(Options.SpawnIdle && this.canBeIdle ? 0 : 1, 12);
+        var random = generateNumber(Options.SpawnIdleParticles && this.canBeIdle ? 0 : 1, 12);
 
         switch (random) {
             case 0:

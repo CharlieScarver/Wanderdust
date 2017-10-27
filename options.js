@@ -1,6 +1,7 @@
 var Options = {
-    SpawnIdle: false,
+    SpawnIdleParticles: false,
     MaxParticles: 450,
-    MaxIdleParticles: 100,
-    DrawLinesInRadius: 60
+    MaxIdleParticles: 60,
+    DrawLinesInRadius: 60,
+    ParticlesCreatedPerSpawn: 5
 };

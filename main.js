@@ -9,9 +9,6 @@ var paused = false,
     ticksPassed = 0,
     cleanTicks = 30;
 
-var particlesToSpawn = 450;
-var maxIdleParticles = 100;
-var drawLinesInRadius = 60;
 var particles = [];
 var indexesToClean = [];
 var drawLinesBetween = [];
@@ -48,9 +45,9 @@ function tick() {
     }
 
     // Spawning new particles
-    if (particles.length < particlesToSpawn) {
+    if (particles.length < Options.MaxParticles - Options.ParticlesCreatedPerSpawn) {
         var randomX, randomY;
-        var canBeIdle = particles.length < maxIdleParticles;
+        var canBeIdle = particles.filter(p => p.movement.idle).length < Options.MaxIdleParticles;
 
         // Spawn five at a time to spawn faster
         randomX = Math.floor(Math.floor(Math.random() * 10000) % canvas.width);
@@ -86,7 +83,7 @@ function tick() {
             if (p.isOutside || index === index2) {
                 return;
             }
-            var isNear = checkIfPointIsInsideACircle(p.position.x, p.position.y, p2.position.x, p2.position.y, drawLinesInRadius);
+            var isNear = checkIfPointIsInsideACircle(p.position.x, p.position.y, p2.position.x, p2.position.y, Options.DrawLinesInRadius);
             if (isNear) {
                 drawLinesBetween.push({ from: index, to: index2 });
             }
@@ -94,6 +91,7 @@ function tick() {
     });
 
     ticksPassed++;
+    updateShownValues();
 }
 
 function render(ctx) {
@@ -107,8 +105,8 @@ function render(ctx) {
     // Pause text
     if (paused) {
         ctx.fillStyle = '#FFFFFF';
-        ctx.font = "40px Arial";
-        ctx.fillText("Paused", canvas.width / 2 - 100, 250);
+        ctx.font = '40px Arial';
+        ctx.fillText('Paused', canvas.width / 2 - 100, 250);
     }
 
     // Draw the lines

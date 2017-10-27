@@ -23,13 +23,18 @@
             text-align: center;
         }
 
+        .display-block {
+            display: block;
+        }
+
         #canvas-container {
             width: 1280px;
             margin: 50px auto;
         }
 
         #controls {
-            padding: 30px; 
+            padding: 30px;
+            float: left;
         }
 
         #controls input {
@@ -41,8 +46,32 @@
 
 <body>
     <div id="controls">
-        <label>Spawn Idle: </label>
-        <input type="checkbox" id="Spawn Idle" />
+        <div>
+            <label>All Particles: </label>
+            <span id="All Particles Value"></span>
+        </div>
+        <div>
+            <label>Idle Particles: </label>
+            <span id="Idle Particles Value"></span>
+        </div>
+        <div>
+            <label>Spawn Idle Particles: </label>
+            <input type="checkbox" id="Spawn Idle Particles"/>
+        </div>
+        <div>
+            <div>
+                <label>Max Particles: </label>
+                <span id="Max Particles Value"></span>
+            </div>
+            <input type="range" min="1" max="700" class="display-block" id="Max Particles">
+        </div>
+        <div>
+            <div>
+                <label>Max Idle Particles: </label>
+                <span id="Max Idle Particles Value"></span>
+            </div>
+            <input type="range" min="1" max="700" class="display-block" id="Max Idle Particles">
+        </div>
     </div>
     <div id="canvas-container">
         <canvas id="canvas" width="1280" height="720"></canvas>
