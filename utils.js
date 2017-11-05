@@ -45,3 +45,5 @@ function checkIfPointIsInsideACircle(centerX, centerY, pointX, pointY, radius) {
 
     return false;
 }
+
+function noop() {}
