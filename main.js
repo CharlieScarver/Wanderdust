@@ -1,6 +1,17 @@
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
 
+function canvasResized() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+};
+
+// Resize canvas when the window resizes.
+window.onresize = canvasResized;
+
+// Set initial size.
+canvasResized();
+
 var input = new Input();
 attachListeners(input);
 attachControls();
@@ -37,7 +48,7 @@ function tick() {
 
     // Cleaning needs to happen before adding to drawLinesBetween to make sure indexes are right
     if (ticksPassed === cleanTicks) {
-        indexesToClean.forEach(function (ind) {
+        indexesToClean.forEach(function(ind) {
             particles.splice(ind, 1);
         });
         indexesToClean.clear();
@@ -75,11 +86,11 @@ function tick() {
     particles = particles.filter(x => !x.isOutside);
 
     // Update, mark for cleanup and mark near particles
-    particles.forEach(function (p, index) {
+    particles.forEach(function(p, index) {
         // Update particles
         p.update(canvas.width, canvas.height);
         // Check for nearby particles to draw lines
-        particles.forEach(function (p2, index2) {
+        particles.forEach(function(p2, index2) {
             if (p.isOutside || index === index2) {
                 return;
             }
@@ -111,7 +122,7 @@ function render(ctx) {
 
     // Draw the lines
     ctx.strokeStyle = '#FFFFFF';
-    drawLinesBetween.forEach(function (o) {
+    drawLinesBetween.forEach(function(o) {
         // Lucky particles get colored lines
         if (particles[o.from].ID % 19 === 0) {
             ctx.strokeStyle = '#FF0000';
@@ -144,7 +155,7 @@ function render(ctx) {
     drawLinesBetween.clear();
 
     // Render particles
-    particles.forEach(function (p) {
+    particles.forEach(function(p) {
         p.render(ctx);
     });
 }
