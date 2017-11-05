@@ -1,16 +1,8 @@
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
 
-function canvasResized() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-};
-
-// Resize canvas when the window resizes.
-window.onresize = canvasResized;
-
-// Set initial size.
-canvasResized();
+// Set initial canvas size
+resizeCanvas();
 
 var input = new Input();
 attachListeners(input);

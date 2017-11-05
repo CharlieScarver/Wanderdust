@@ -28,12 +28,9 @@
             display: block;
         }
 
-        #canvas {
-            width: 100%;
-            margin: 0;
-            position: absolute;
-            left: 0px;
-            top: 0px;
+        #canvas-container {
+            width: 1280px;
+            margin: 50px auto;
         }
 
         #controls-button {
@@ -42,11 +39,16 @@
             left: 10px;
             top: 10px;
             font-size: 2em;
+            font-weight: bold;
             cursor: pointer;
         }
 
         #controls-button:hover {
             color: red;
+        }
+
+        #controls-button:active {
+            font-size: 1.93em;
         }
 
         #controls {
@@ -56,7 +58,7 @@
             position: absolute;
             left: 10px;
             top: 50px;
-            background-color: rgba(43, 45, 48, 0.5);
+            background-color: rgba(36, 38, 40, 0.5);
         }
 
         #controls input {
@@ -77,6 +79,10 @@
     <div id="controls-button">⚙</div>
     <div id="controls">
         <div>
+            <label>Resize canvas to screen resolution: </label>
+            <input type="checkbox" id="ResizeCanvasToScreenResolution" />
+        </div>
+        <div>
             <label>All Particles: </label>
             <span id="All Particles Value"></span>
         </div>
@@ -85,7 +91,7 @@
                 <label>Max Particles: </label>
                 <span id="Max Particles Value"></span>
             </div>
-            <input type="range" min="1" max="700" class="display-block" id="Max Particles">
+            <input type="range" min="1" max="700" class="display-block" id="Max Particles" />
         </div>
         <div>
             <label>Spawn Idle Particles: </label>
@@ -101,7 +107,7 @@
                     <label>Max Idle Particles: </label>
                     <span id="Max Idle Particles Value"></span>
                 </div>
-                <input type="range" min="1" max="700" class="display-block" id="Max Idle Particles">
+                <input type="range" min="1" max="700" class="display-block" id="Max Idle Particles" />
             </div>
         </div>
     </div>
