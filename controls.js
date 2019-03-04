@@ -10,6 +10,14 @@ var IdleParticlesValue = document.getElementById('Idle Particles Value');
 var MaxParticles = document.getElementById('Max Particles');
 var MaxParticlesValue = document.getElementById('Max Particles Value');
 
+var MinParticleVelocity = document.getElementById('Min Particle Velocity');
+var MinParticleVelocityValue = document.getElementById('Min Particle Velocity Value');
+
+var MaxLineLength = document.getElementById('Max Line Length');
+var MaxLineLengthValue = document.getElementById('Max Line Length Value');
+
+var DrawParticles = document.getElementById('Draw Particles');
+
 // Idle particles
 var IdleOptions = document.getElementById('idleOptions');
 var SpawnIdleParticles = document.getElementById('Spawn Idle Particles');
@@ -31,15 +39,29 @@ function attachControls() {
     };
 
     ControlsHolder.style.display = 'none';
+    // Canvas
     ResizeCanvasToScreenResolution.checked = Options.ResizeCanvasToScreenResolution;
     ResizeCanvasToScreenResolution.onchange = toggleResizeCanvasToScreenResolution;
 
-    SpawnIdleParticles.checked = Options.SpawnIdleParticles;
-    SpawnIdleParticles.onchange = toggleSpawnIdleParticles;
-
+    // Particles
     MaxParticles.value = Options.MaxParticles;
     MaxParticles.onchange = onChangeMaxParticles;
     MaxParticlesValue.innerHTML = Options.MaxParticles;
+
+    MinParticleVelocity.value = Options.MinParticleVelocity;
+    MinParticleVelocity.onchange = onChangeMinParticleVelocity;
+    MinParticleVelocityValue.innerHTML = Options.MinParticleVelocity;
+
+	MaxLineLength.value = Options.DrawLinesInRadius;
+    MaxLineLength.onchange = onChangeMaxLineLength;
+    MaxLineLengthValue.innerHTML = Options.DrawLinesInRadius;
+
+    DrawParticles.checked = Options.DrawParticles;
+    DrawParticles.onchange = toggleDrawParticles;
+
+    // Idle Particles
+    SpawnIdleParticles.checked = Options.SpawnIdleParticles;
+    SpawnIdleParticles.onchange = toggleSpawnIdleParticles;
 
     MaxIdleParticles.value = Options.MaxIdleParticles;
     MaxIdleParticles.onchange = onChangeMaxIdleParticles;
@@ -93,14 +115,36 @@ function toggleResizeCanvasToScreenResolution(e) {
     resizeCanvas();
 }
 
-// Toggles spawning moving
-function toggleSpawnIdleParticles(e) {
-    clearParticles();
-    // Change the options value
-    Options.SpawnIdleParticles = e.target.checked;
-    toggleIdleOptionsVisibility();
+// Change max particles limit
+function onChangeMaxParticles(e) {
+    Options.MaxParticles = e.target.value;
+    MaxParticlesValue.innerHTML = Options.MaxParticles;
 }
 
+// Change min particle velocity
+function onChangeMinParticleVelocity(e) {
+    Options.MinParticleVelocity = Number(e.target.value);
+    MinParticleVelocityValue.innerHTML = Options.MinParticleVelocity;
+}
+
+// Change max line length
+function onChangeMaxLineLength(e) {
+    Options.DrawLinesInRadius = Number(e.target.value);
+    MaxLineLengthValue.innerHTML = Options.DrawLinesInRadius;
+}
+
+// Change idle particles limit
+function onChangeMaxIdleParticles(e) {
+    Options.MaxIdleParticles = Number(e.target.value);
+    MaxIdleParticlesValue.innerHTML = Options.MaxIdleParticles;
+}
+
+// Toggles drawing of particles
+function toggleDrawParticles(e) {
+    Options.DrawParticles = e.target.checked;
+}
+
+// Toggles if the controls for idle particles are visible or not
 function toggleIdleOptionsVisibility() {
     if (Options.SpawnIdleParticles) {
         IdleOptions.style.display = '';
@@ -109,14 +153,10 @@ function toggleIdleOptionsVisibility() {
     }
 }
 
-// Change max particles limit
-function onChangeMaxParticles(e) {
-    Options.MaxParticles = e.target.value;
-    MaxParticlesValue.innerHTML = Options.MaxParticles;
-}
-
-// Change idle particles limit
-function onChangeMaxIdleParticles(e) {
-    Options.MaxIdleParticles = e.target.value;
-    MaxIdleParticlesValue.innerHTML = Options.MaxIdleParticles;
+// Toggles spawning of idle particles
+function toggleSpawnIdleParticles(e) {
+    clearParticles();
+    // Change the options value
+    Options.SpawnIdleParticles = e.target.checked;
+    toggleIdleOptionsVisibility();
 }

@@ -17,8 +17,9 @@ var Particle = (function() {
 
         this.width = 1;
         this.height = 1;
-        this.minVelocity = 1;
-        this.maxVelocity = 4;
+        this.minVelocity = Options.MinParticleVelocity;
+        this.velocityRange = Options.ParticleVelocityRange;
+        // Max Velocity = velocityRange + minVelocity - 1
 
         this.ticksNeededToChange = 100000;
         this.ticksPassed = 0;
@@ -78,8 +79,8 @@ var Particle = (function() {
                 break;
         };
 
-        this.velocityX = Math.floor(Math.floor(Math.random() * 100) % this.maxVelocity) + this.minVelocity;
-        this.velocityY = Math.floor(Math.floor(Math.random() * 100) % this.maxVelocity) + this.minVelocity;
+        this.velocityX = Math.floor(Math.floor(Math.random() * 100) % this.velocityRange) + this.minVelocity;
+        this.velocityY = Math.floor(Math.floor(Math.random() * 100) % this.velocityRange) + this.minVelocity;
     }
 
     Particle.prototype.update = function(width, height) {
@@ -115,7 +116,7 @@ var Particle = (function() {
 
 
     Particle.prototype.render = function(ctx) {
-        if (this.isOutside) {
+        if (!Options.DrawParticles || this.isOutside) {
             return;
         }
 
