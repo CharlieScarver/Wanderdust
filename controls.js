@@ -90,7 +90,7 @@ function resizeCanvas() {
         CanvasContainer.style.width = 'auto';
     } else {
         // Disable canvas resize on window resize
-        window.onresize = noop;
+        window.onresize = Utils.noop;
 
         // Resize canvas to default size
         canvas.width = Options.DefaultCanvasSize.width;

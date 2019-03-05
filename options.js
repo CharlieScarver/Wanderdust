@@ -11,8 +11,10 @@ var Options = {
     ParticlesCreatedPerSpawn: 5, // not fully used yet
     MinParticleVelocity: 1,
     ParticleVelocityRange: 4,
-    DrawParticles: true,
+    DrawParticles: false,
     // Idle Particles
     SpawnIdleParticles: false,
-    MaxIdleParticles: 60
+    MaxIdleParticles: 60,
+    // Debug
+    SpawnDebugParticle: false
 };

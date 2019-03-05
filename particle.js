@@ -1,7 +1,7 @@
 var Particle = (function() {
     Particle.prototype.Count = 0;
 
-    function Particle(x, y, canBeIdle) {
+    function Particle(x, y, canBeIdle, debug = false) {
         this.ID = ++Particle.prototype.Count;
         this.position = {
             x: x,
@@ -27,6 +27,8 @@ var Particle = (function() {
         this.isOutside = false;
         this.canBeIdle = canBeIdle;
 
+        this.debug = debug;
+
         this.randomizeMovement();
     }
 
@@ -39,7 +41,7 @@ var Particle = (function() {
             idle: false
         };
 
-        var random = generateNumber(Options.SpawnIdleParticles && this.canBeIdle ? 0 : 1, 12);
+        var random = Utils.generateNumber(Options.SpawnIdleParticles && this.canBeIdle ? 0 : 1, 12);
 
         switch (random) {
             case 0:
@@ -114,8 +116,13 @@ var Particle = (function() {
         this.ticksPassed++;
     };
 
-
     Particle.prototype.render = function(ctx) {
+        if (this.debug) {
+            ctx.fillStyle = '#FFFF00'
+            ctx.fillRect(this.position.x, this.position.y, 5, 5);
+            return;
+        }
+
         if (!Options.DrawParticles || this.isOutside) {
             return;
         }
@@ -123,6 +130,13 @@ var Particle = (function() {
         ctx.fillStyle = '#FFFFFF'
         ctx.fillRect(this.position.x, this.position.y, this.width, this.height);
     };
+
+    Particle.prototype.log = function() {
+        if (!this.debug) {
+            return;
+        }
+        console.log(...arguments);
+    }
 
     return Particle;
 }());

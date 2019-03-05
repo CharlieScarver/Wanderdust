@@ -23,6 +23,8 @@ function update() {
 }
 
 function tick() {
+    var isThereADebugParticle = !Options.SpawnDebugParticle;
+
     // Pausing
     if (input.o) {
         if (paused) {
@@ -50,48 +52,52 @@ function tick() {
     // Spawning new particles
     if (particles.length < Options.MaxParticles - Options.ParticlesCreatedPerSpawn) {
         var randomX, randomY;
-        var canBeIdle = particles.filter(p => p.movement.idle).length < Options.MaxIdleParticles;
+        var canBeIdle = particles.filter(function(p) { return p.movement.idle; }).length < Options.MaxIdleParticles;
 
-        // Spawn five at a time to spawn faster
-        randomX = Math.floor(Math.floor(Math.random() * 10000) % canvas.width);
-        randomY = Math.floor(Math.floor(Math.random() * 10000) % canvas.height);
-        particles.push(new Particle(randomX, randomY, canBeIdle));
-
-        randomX = Math.floor(Math.floor(Math.random() * 10000) % canvas.width);
-        randomY = Math.floor(Math.floor(Math.random() * 10000) % canvas.height);
-        particles.push(new Particle(randomX, randomY, canBeIdle));
-
-        randomX = Math.floor(Math.floor(Math.random() * 10000) % canvas.width);
-        randomY = Math.floor(Math.floor(Math.random() * 10000) % canvas.height);
-        particles.push(new Particle(randomX, randomY, canBeIdle));
-
-        randomX = Math.floor(Math.floor(Math.random() * 10000) % canvas.width);
-        randomY = Math.floor(Math.floor(Math.random() * 10000) % canvas.height);
-        particles.push(new Particle(randomX, randomY, canBeIdle));
-
-        randomX = Math.floor(Math.floor(Math.random() * 10000) % canvas.width);
-        randomY = Math.floor(Math.floor(Math.random() * 10000) % canvas.height);
-        particles.push(new Particle(randomX, randomY, canBeIdle));
+        // Spawn a couple at a time to spawn faster
+        for (var i = 0; i < Options.ParticlesCreatedPerSpawn; i++) {
+            randomX = Math.floor(Math.floor(Math.random() * 10000) % canvas.width);
+            randomY = Math.floor(Math.floor(Math.random() * 10000) % canvas.height);
+            particles.push(new Particle(randomX, randomY, canBeIdle));
+        }
     }
 
     // Clear particles which are outside
-    particles = particles.filter(x => !x.isOutside);
+    particles = particles.filter(function(x) { return !x.isOutside; });
 
     // Update, mark for cleanup and mark near particles
     particles.forEach(function(p, index) {
+        if (p.debug) {
+            isThereADebugParticle = p.debug;
+        }
+
         // Update particles
         p.update(canvas.width, canvas.height);
         // Check for nearby particles to draw lines
         particles.forEach(function(p2, index2) {
+            // Skip if the particle is outside the canvas or it is the same particle
             if (p.isOutside || index === index2) {
                 return;
             }
-            var isNear = checkIfPointIsInsideACircle(p.position.x, p.position.y, p2.position.x, p2.position.y, Options.DrawLinesInRadius);
+
+            var isNear = Utils.checkIfPointIsInsideACircle(p.position.x, p.position.y, p2.position.x, p2.position.y, Options.DrawLinesInRadius);
             if (isNear) {
-                drawLinesBetween.push({ from: index, to: index2 });
+                // Skip if this line has already been added
+                var isAlreadyAdded = drawLinesBetween.some(function(o) { return o.from === index && o.to === index2 || o.from === index2 && o.to === index; });
+                if (isAlreadyAdded) {
+                    return;
+                }
+
+                var distance = Utils.distanceBetweenTwoPoints(p.position.x, p.position.y, p2.position.x, p2.position.y);
+                drawLinesBetween.push({ from: index, to: index2, distance: distance });
             }
         });
     });
+
+    // Spawn debug particle if there isn't one (and if debug particle is enabled)
+    if (!isThereADebugParticle) {
+        particles.push(new Particle(600, 350, false, true));
+    }
 
     ticksPassed++;
     updateShownValues();
@@ -113,11 +119,14 @@ function render(ctx) {
     }
 
     // Draw the lines
-    ctx.strokeStyle = '#FFFFFF';
     drawLinesBetween.forEach(function(o) {
+        // Determine opacity percentage
+        var percentage = 100 - Math.round(o.distance / Options.DrawLinesInRadius * 100);
+        ctx.strokeStyle = `rgba(255,255,255,0.${percentage.toString().padStart(2, '0')})`;
+
         // Lucky particles get colored lines
         if (particles[o.from].ID % 19 === 0) {
-            ctx.strokeStyle = '#FF0000';
+            ctx.strokeStyle = `rgba(255,0,0,0.${percentage.toString().padStart(2, '0')})`;
         }
         /*
         if (particles[o.from].ID % 37 === 0) {
@@ -136,13 +145,12 @@ function render(ctx) {
             ctx.strokeStyle = '#FF00FF';
         }
         */
+
         // Draw line
         ctx.beginPath();
         ctx.moveTo(particles[o.from].position.x, particles[o.from].position.y);
         ctx.lineTo(particles[o.to].position.x, particles[o.to].position.y);
         ctx.stroke();
-        // Back to the default color
-        ctx.strokeStyle = '#FFFFFF';
     });
     drawLinesBetween.clear();
 
