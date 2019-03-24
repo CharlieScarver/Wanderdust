@@ -8,13 +8,13 @@ var input = new Input();
 attachListeners(input);
 attachControls();
 
-var paused = false,
-    ticksPassed = 0,
-    cleanTicks = 30;
+var paused = false;
+var ticksPassed = 0;
+var CLEAN_TICKS = 30;
 
 var particles = [];
 var indexesToClean = [];
-var drawLinesBetween = [];
+var linesToDraw = {};
 
 function update() {
     tick();
@@ -36,12 +36,8 @@ function tick() {
         }
     }
 
-    if (paused) {
-        return;
-    }
-
-    // Cleaning needs to happen before adding to drawLinesBetween to make sure indexes are right
-    if (ticksPassed === cleanTicks) {
+    // Cleaning needs to happen before adding to linesToDraw to make sure indexes are right
+    if (ticksPassed === CLEAN_TICKS) {
         indexesToClean.forEach(function(ind) {
             particles.splice(ind, 1);
         });
@@ -71,8 +67,11 @@ function tick() {
             isThereADebugParticle = p.debug;
         }
 
-        // Update particles
-        p.update(canvas.width, canvas.height);
+        if (!paused) {
+            // Update particles
+            p.update(canvas.width, canvas.height);
+        }
+
         // Check for nearby particles to draw lines
         particles.forEach(function(p2, index2) {
             // Skip if the particle is outside the canvas or it is the same particle
@@ -83,13 +82,13 @@ function tick() {
             var isNear = Utils.checkIfPointIsInsideACircle(p.position.x, p.position.y, p2.position.x, p2.position.y, Options.DrawLinesInRadius);
             if (isNear) {
                 // Skip if this line has already been added
-                var isAlreadyAdded = drawLinesBetween.some(function(o) { return o.from === index && o.to === index2 || o.from === index2 && o.to === index; });
+                var isAlreadyAdded = !!linesToDraw[index + '.' + index2];
                 if (isAlreadyAdded) {
                     return;
                 }
 
                 var distance = Utils.distanceBetweenTwoPoints(p.position.x, p.position.y, p2.position.x, p2.position.y);
-                drawLinesBetween.push({ from: index, to: index2, distance: distance });
+                linesToDraw[index + '.' + index2] = { from: index, to: index2, distance: distance };
             }
         });
     });
@@ -114,19 +113,21 @@ function render(ctx) {
     // Pause text
     if (paused) {
         ctx.fillStyle = '#FFFFFF';
-        ctx.font = '40px Arial';
-        ctx.fillText('Paused', canvas.width / 2 - 100, 250);
+        ctx.font = '20px Courier';
+        ctx.fillText('Paused', canvas.width / 2 - 50, 50);
     }
 
     // Draw the lines
-    drawLinesBetween.forEach(function(o) {
+    for (var key in linesToDraw) {
+        var o = linesToDraw[key];
+
         // Determine opacity percentage
         var percentage = 100 - Math.round(o.distance / Options.DrawLinesInRadius * 100);
-        ctx.strokeStyle = `rgba(255,255,255,0.${percentage.toString().padStart(2, '0')})`;
+        ctx.strokeStyle = `rgba(255,255,255,0.${Utils.padStringLeft(percentage.toString(), 2, '0')})`;
 
         // Lucky particles get colored lines
         if (particles[o.from].ID % 19 === 0) {
-            ctx.strokeStyle = `rgba(255,0,0,0.${percentage.toString().padStart(2, '0')})`;
+            ctx.strokeStyle = `rgba(255,0,0,0.${Utils.padStringLeft(percentage.toString(), 2, '0')})`;
         }
         /*
         if (particles[o.from].ID % 37 === 0) {
@@ -151,13 +152,15 @@ function render(ctx) {
         ctx.moveTo(particles[o.from].position.x, particles[o.from].position.y);
         ctx.lineTo(particles[o.to].position.x, particles[o.to].position.y);
         ctx.stroke();
-    });
-    drawLinesBetween.clear();
+    }
 
     // Render particles
     particles.forEach(function(p) {
         p.render(ctx);
     });
+
+    // Clear the data about the lines
+    linesToDraw = {};
 }
 
 update();

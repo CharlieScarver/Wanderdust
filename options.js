@@ -8,7 +8,7 @@ var Options = {
     // Particles
     MaxParticles: 450,
     DrawLinesInRadius: 60,
-    ParticlesCreatedPerSpawn: 5, // not fully used yet
+    ParticlesCreatedPerSpawn: 5,
     MinParticleVelocity: 1,
     ParticleVelocityRange: 4,
     DrawParticles: false,
