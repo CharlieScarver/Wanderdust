@@ -1,3 +1,7 @@
 # Wonderdust
 
-Geometric chaos. See it in action [here](https://charliescarver.github.io/Wanderdust/). 
+Geometric chaos. 
+
+Consciously written in "2013 JavaScript".
+
+See it in action [here](https://charliescarver.github.io/Wanderdust/). 
