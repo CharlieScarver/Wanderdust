@@ -5,6 +5,8 @@ var Options = {
         width: 1280,
         height: 720
     },
+    // Pause
+    Paused: false,
     // Particles
     MaxParticles: 450,
     DrawLinesInRadius: 60,
