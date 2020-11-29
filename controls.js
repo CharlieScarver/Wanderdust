@@ -1,4 +1,4 @@
-var Controls = (function() {
+var Controls = (function () {
     var ControlsHolder = document.getElementById('controls');
 
     // Canvas
@@ -30,6 +30,12 @@ var Controls = (function() {
     var MaxIdleParticles = document.getElementById('Max Idle Particles');
     var MaxIdleParticlesValue = document.getElementById('Max Idle Particles Value');
 
+    var ConnectParticlesToMouse = document.getElementById('Connect Particles To Mouse');
+    var MousePosition = { X: 0, Y: 0 };
+
+    var LuckyParticles = document.getElementById('Spawn Lucky Particles');
+    var LuckyOptions = document.getElementById('luckyOptions');
+    var LuckyOptionsMode = document.getElementsByName('luckyOptionsMode');
 
     // Clear current points
     function clearParticles() {
@@ -65,7 +71,7 @@ var Controls = (function() {
     }
 
     // Update the shown values
-    function updateShownValues() {
+    function updateShownValues(particles) {
         AllParticlesValue.innerHTML = particles.length;
         IdleParticlesValue.innerHTML = particles.filter(p => p.movement.idle).length;
     }
@@ -79,6 +85,32 @@ var Controls = (function() {
     // Toggles if the update of particles is paused or not
     function togglePaused(e) {
         Options.Paused = e.target.checked;
+    }
+
+    // Toggles if the lucky particles should spawn
+    function toggleLuckyParticles(e) {
+        Options.SpawnLuckyParticles = e.target.checked;
+        toggleLuckyParticleOptionsVisibility(Options.SpawnLuckyParticles);
+    }
+
+    function toggleLuckyParticleOptionsVisibility() {
+        if (Options.SpawnLuckyParticles) {
+            LuckyOptions.style.display = '';
+        } else {
+            LuckyOptions.style.display = 'none';
+        }
+    }
+
+    function toggleLuckyParticlesMode() {
+        var mode;
+        for (var i = 0; i < LuckyOptionsMode.length; i++) {
+            if (LuckyOptionsMode[i].checked) {
+                mode = LuckyOptionsMode[i].value;
+                break;
+            }
+        }
+
+        Options.LuckyParticlesMode = mode;
     }
 
     // Change max particles limit
@@ -110,6 +142,22 @@ var Controls = (function() {
         Options.DrawParticles = e.target.checked;
     }
 
+    function toggleConnectParticlesToMouse(e) {
+        Options.ConnectParticlesToMouse = e.target.checked;
+        
+        if (Options.ConnectParticlesToMouse) {
+            window.addEventListener('mousemove', updateMousePoisition, false);
+        }
+        else {
+            window.removeEventListener('mousemove', updateMousePoisition, false);
+        }
+    }
+
+    function updateMousePoisition(e) {
+        MousePosition.X = e.clientX;
+        MousePosition.Y = e.clientY;
+    }
+
     // Toggles if the controls for idle particles are visible or not
     function toggleIdleOptionsVisibility() {
         if (Options.SpawnIdleParticles) {
@@ -126,6 +174,7 @@ var Controls = (function() {
         Options.SpawnIdleParticles = e.target.checked;
         toggleIdleOptionsVisibility();
     }
+
 
     // Attach click events to the controls
     function attachControls() {
@@ -173,13 +222,25 @@ var Controls = (function() {
         MaxIdleParticles.onchange = onChangeMaxIdleParticles;
         MaxIdleParticlesValue.innerHTML = Options.MaxIdleParticles;
 
+        // Mouse 
+        ConnectParticlesToMouse.checked = Options.ConnectParticlesToMouse;
+        ConnectParticlesToMouse.onchange = toggleConnectParticlesToMouse;
+
+        // Lucky Particles
+        LuckyParticles.checked = Options.SpawnLuckyParticles;
+        LuckyParticles.onchange = toggleLuckyParticles;
+        LuckyOptions.onchange = toggleLuckyParticlesMode;
+
+
         toggleIdleOptionsVisibility();
+        toggleLuckyParticleOptionsVisibility();
     }
 
     return {
         Paused,
         resizeCanvas,
         attachControls,
-        updateShownValues
+        updateShownValues,
+        MousePosition
     };
 }());

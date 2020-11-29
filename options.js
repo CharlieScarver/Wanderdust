@@ -18,5 +18,8 @@ var Options = {
     SpawnIdleParticles: false,
     MaxIdleParticles: 60,
     // Debug
-    SpawnDebugParticle: false
+    SpawnDebugParticle: false,
+    SpawnLuckyParticles: true,
+    LuckyParticlesMode: "classic",
+    ConnectParticlesToMouse: false
 };

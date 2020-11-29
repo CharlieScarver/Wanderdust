@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 
 <head lang="en">
@@ -130,6 +130,26 @@
                     <span id="Max Idle Particles Value"></span>
                 </div>
                 <input type="range" min="1" max="700" class="display-block" id="Max Idle Particles" />
+            </div>
+        </div>
+        <div id="mouseOptions">
+            <label>Connect particles to mouse: </label>
+            <input type="checkbox" id="Connect Particles To Mouse" />
+        </div>
+        <div>
+            <label>Spawn lucky particles: </label>
+            <input type="checkbox" id="Spawn Lucky Particles" />
+        </div>
+        <div id="luckyOptions">
+            <div>
+                <input type="radio" id="classic" name="luckyOptionsMode" value="classic" checked>
+                <label for="classic">Classic</label>
+            </div>
+            <div>
+                <div>
+                    <input type="radio" id="fresh" name="luckyOptionsMode" value="fresh">
+                    <label for="fresh">Fresh</label>
+                </div>
             </div>
         </div>
     </div>
