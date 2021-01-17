@@ -118,7 +118,7 @@ var Particle = (function() {
 
     Particle.prototype.render = function(ctx) {
         if (this.debug) {
-            ctx.fillStyle = '#FFFF00'
+            ctx.fillStyle = '#FFFF00';
             ctx.fillRect(this.position.x, this.position.y, 5, 5);
             return;
         }
@@ -127,7 +127,7 @@ var Particle = (function() {
             return;
         }
 
-        ctx.fillStyle = '#FFFFFF'
+        ctx.fillStyle = '#FFFFFF';
         ctx.fillRect(this.position.x, this.position.y, this.width, this.height);
     };
 

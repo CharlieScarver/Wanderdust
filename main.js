@@ -1,4 +1,4 @@
-var Main = (function(){
+var Main = (function () {
     var canvas = document.getElementById('canvas');
     var ctx = canvas.getContext('2d');
 
@@ -9,11 +9,7 @@ var Main = (function(){
     Input.attachListeners(input);
     Controls.attachControls();
 
-    var ticksPassed = 0;
-    var CLEAN_TICKS = 30;
-
     var particles = [];
-    var indexesToClean = [];
     var linesToDraw = {};
 
     function update() {
@@ -23,7 +19,7 @@ var Main = (function(){
     }
 
     function tick() {
-        var isThereADebugParticle = !Options.SpawnDebugParticle;
+        var shouldSpawnDebugParticle = Options.SpawnDebugParticle;
 
         // Pausing
         if (input.o) {
@@ -35,19 +31,10 @@ var Main = (function(){
             input.o = false;
         }
 
-        // Cleaning needs to happen before adding to linesToDraw to make sure indexes are right
-        if (ticksPassed === CLEAN_TICKS) {
-            indexesToClean.forEach(function(ind) {
-                particles.splice(ind, 1);
-            });
-            indexesToClean.clear();
-            ticksPassed = 0;
-        }
-
         // Spawning new particles
         if (particles.length < Options.MaxParticles - Options.ParticlesCreatedPerSpawn) {
             var randomX, randomY;
-            var canBeIdle = particles.filter(function(p) { return p.movement.idle; }).length < Options.MaxIdleParticles;
+            var canBeIdle = particles.filter(function (p) { return p.movement.idle; }).length < Options.MaxIdleParticles;
 
             // Spawn a couple at a time to spawn faster
             for (var i = 0; i < Options.ParticlesCreatedPerSpawn; i++) {
@@ -58,21 +45,20 @@ var Main = (function(){
         }
 
         // Clear particles which are outside
-        particles = particles.filter(function(x) { return !x.isOutside; });
+        particles = particles.filter(function (x) { return !x.isOutside; });
+        shouldSpawnDebugParticle = shouldSpawnDebugParticle && !particles.some(p => p.debug);
+
+        var addedLines = {};
 
         // Update, mark for cleanup and mark near particles
-        particles.forEach(function(p, index) {
-            if (p.debug) {
-                isThereADebugParticle = p.debug;
-            }
-
+        particles.forEach(function (p, index) {
             if (!Options.Paused) {
                 // Update particles
                 p.update(canvas.width, canvas.height);
             }
 
             // Check for nearby particles to draw lines
-            particles.forEach(function(p2, index2) {
+            particles.forEach(function (p2, index2) {
                 // Skip if the particle is outside the canvas or it is the same particle
                 if (p.isOutside || index === index2) {
                     return;
@@ -81,7 +67,7 @@ var Main = (function(){
                 var isNear = Utils.checkIfPointIsInsideACircle(p.position.x, p.position.y, p2.position.x, p2.position.y, Options.DrawLinesInRadius);
                 if (isNear) {
                     // Skip if this line has already been added
-                    var isAlreadyAdded = !!linesToDraw[index + '.' + index2];
+                    var isAlreadyAdded = !!linesToDraw[index2 + '.' + index];
                     if (isAlreadyAdded) {
                         return;
                     }
@@ -93,12 +79,11 @@ var Main = (function(){
         });
 
         // Spawn debug particle if there isn't one (and if debug particle is enabled)
-        if (!isThereADebugParticle) {
+        if (shouldSpawnDebugParticle) {
             particles.push(new Particle(600, 350, false, true));
         }
 
-        ticksPassed++;
-        Controls.updateShownValues();
+        Controls.updateShownValues(particles);
     }
 
     function render(ctx) {
@@ -122,29 +107,29 @@ var Main = (function(){
 
             // Determine opacity percentage
             var percentage = 100 - Math.round(o.distance / Options.DrawLinesInRadius * 100);
-            ctx.strokeStyle = `rgba(255,255,255,0.${Utils.padStringLeft(percentage.toString(), 2, '0')})`;
+
+            ctx.strokeStyle = createRGBAStylePercent(255, 255, 255, percentage);
 
             // Lucky particles get colored lines
-            if (particles[o.from].ID % 19 === 0) {
-                ctx.strokeStyle = `rgba(255,0,0,0.${Utils.padStringLeft(percentage.toString(), 2, '0')})`;
+            if (Options.SpawnLuckyParticles) {
+                var luckyMode = Options.LuckyParticlesMode;
+                if (luckyMode === "classic") {
+                    if (particles[o.from].ID % 19 === 0) {
+                        ctx.strokeStyle = createRGBAStylePercent(255, 0, 0, percentage);
+                    }
+                }
+                else if (luckyMode === "fresh") {
+                    if (particles[o.from].ID % 19 === 0) {
+                        ctx.strokeStyle = createRGBAStylePercent(255, 0, 0, percentage);
+                    }
+                    else if (particles[o.from].ID % 17 === 0) {
+                        ctx.strokeStyle = createRGBAStylePercent(255, 255, 0, percentage);
+                    }
+                    else if (particles[o.from].ID % 37 === 0) {
+                        ctx.strokeStyle = createRGBAStylePercent(0, 255, 0, percentage);
+                    }
+                }
             }
-            /*
-            if (particles[o.from].ID % 37 === 0) {
-                ctx.strokeStyle = '#00FF00';
-            }
-            if (particles[o.from].ID % 17 === 0) {
-                ctx.strokeStyle = '#FFFF00';
-            }
-            if (particles[o.from].ID % 19 === 0) {
-                ctx.strokeStyle = '#0000FF';
-            }
-            if (particles[o.from].ID % 15 === 0) {
-                ctx.strokeStyle = '#00FFFF';
-            }
-            if (particles[o.from].ID % 13 === 0) {
-                ctx.strokeStyle = '#FF00FF';
-            }
-            */
 
             // Draw line
             ctx.beginPath();
@@ -154,12 +139,52 @@ var Main = (function(){
         }
 
         // Render particles
-        particles.forEach(function(p) {
+        particles.forEach(function (p) {
             p.render(ctx);
         });
 
+        // Render mouse lines
+        if (Options.ConnectParticlesToMouse) {
+            var cMouse = getCanvasMousePositon(canvas, Controls.MousePosition);
+            if (!cMouse.isOOb) {
+                particles.forEach((p) => {
+                    var x1 = cMouse.x, y1 = cMouse.y;
+                    var x2 = p.position.x, y2 = p.position.y;
+
+                    var isNear = Utils.checkIfPointIsInsideACircle(x1, y1, x2, y2, Options.DrawLinesInRadius);
+                    if (!isNear) {
+                        return;
+                    }
+
+                    ctx.strokeStyle = createRGBAStylePercent(0, 0, 255, 99);
+
+                    ctx.beginPath();
+                    ctx.moveTo(x1, y1);
+                    ctx.lineTo(x2, y2);
+                    ctx.stroke();
+                });
+            }
+        }
+
         // Clear the data about the lines
         linesToDraw = {};
+    }
+
+    function createRGBAStylePercent(r, g, b, aPercentage) {
+        return `rgba(${r},${g},${b},0.${Utils.padStringLeft(aPercentage.toString(), 2, '0')})`;
+    }
+
+    function getCanvasMousePositon(canvas, screenCoordinates) {
+        var rect = canvas.getBoundingClientRect();
+
+        var scaledX = (screenCoordinates.X - rect.left) / (rect.right - rect.left) * canvas.width;
+        var scaledY = (screenCoordinates.Y - rect.top) / (rect.bottom - rect.top) * canvas.height;
+
+        return {
+            x: (screenCoordinates.X - rect.left) / (rect.right - rect.left) * canvas.width,
+            y: (screenCoordinates.Y - rect.top) / (rect.bottom - rect.top) * canvas.height,
+            isOOb: (scaledX < 0 || scaledY < 0) || (scaledX > canvas.width || scaledY > canvas.height)
+        };
     }
 
     return {
