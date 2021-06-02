@@ -156,7 +156,11 @@ var Main = (function () {
                         return;
                     }
 
-                    ctx.strokeStyle = createRGBAStylePercent(0, 0, 255, 99);
+                    var distance = Utils.distanceBetweenTwoPoints(x1, y1, x2, y2);
+                    // Determine opacity percentage
+                    var percentage = 100 - Math.round(distance / Options.DrawLinesInRadius * 100);
+
+                    ctx.strokeStyle = createRGBAStylePercent(255, 255, 255, percentage);
 
                     ctx.beginPath();
                     ctx.moveTo(x1, y1);

@@ -21,5 +21,5 @@ var Options = {
     SpawnDebugParticle: false,
     SpawnLuckyParticles: true,
     LuckyParticlesMode: "classic",
-    ConnectParticlesToMouse: false
+    ConnectParticlesToMouse: true
 };

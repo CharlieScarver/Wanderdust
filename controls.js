@@ -76,7 +76,7 @@ var Controls = (function () {
         IdleParticlesValue.innerHTML = particles.filter(p => p.movement.idle).length;
     }
 
-    // Toggles if canvas is resized to screen resolution or stays with the default size 
+    // Toggles if canvas is resized to screen resolution or stays with the default size
     function toggleResizeCanvasToScreenResolution(e) {
         Options.ResizeCanvasToScreenResolution = e.target.checked;
         resizeCanvas();
@@ -144,7 +144,7 @@ var Controls = (function () {
 
     function toggleConnectParticlesToMouse(e) {
         Options.ConnectParticlesToMouse = e.target.checked;
-        
+
         if (Options.ConnectParticlesToMouse) {
             window.addEventListener('mousemove', updateMousePoisition, false);
         }
@@ -222,9 +222,13 @@ var Controls = (function () {
         MaxIdleParticles.onchange = onChangeMaxIdleParticles;
         MaxIdleParticlesValue.innerHTML = Options.MaxIdleParticles;
 
-        // Mouse 
+        // Mouse
         ConnectParticlesToMouse.checked = Options.ConnectParticlesToMouse;
         ConnectParticlesToMouse.onchange = toggleConnectParticlesToMouse;
+        // If enabled at start => add the event listener
+        if (Options.ConnectParticlesToMouse) {
+            window.addEventListener('mousemove', updateMousePoisition, false);
+        }
 
         // Lucky Particles
         LuckyParticles.checked = Options.SpawnLuckyParticles;
