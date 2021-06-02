@@ -12,7 +12,7 @@ var Options = {
     DrawLinesInRadius: 60,
     ParticlesCreatedPerSpawn: 5,
     MinParticleVelocity: 1,
-    ParticleVelocityRange: 4,
+    MaxParticleVelocity: 4,
     DrawParticles: false,
     // Idle Particles
     SpawnIdleParticles: false,

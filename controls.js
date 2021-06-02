@@ -18,6 +18,9 @@ var Controls = (function () {
     var MinParticleVelocity = document.getElementById('Min Particle Velocity');
     var MinParticleVelocityValue = document.getElementById('Min Particle Velocity Value');
 
+    var MaxParticleVelocity = document.getElementById('Max Particle Velocity');
+    var MaxParticleVelocityValue = document.getElementById('Max Particle Velocity Value');
+
     var MaxLineLength = document.getElementById('Max Line Length');
     var MaxLineLengthValue = document.getElementById('Max Line Length Value');
 
@@ -125,6 +128,12 @@ var Controls = (function () {
         MinParticleVelocityValue.innerHTML = Options.MinParticleVelocity;
     }
 
+    // Change max particle velocity
+    function onChangeMaxParticleVelocity(e) {
+        Options.MaxParticleVelocity = Number(e.target.value);
+        MaxParticleVelocityValue.innerHTML = Options.MaxParticleVelocity;
+    }
+
     // Change max line length
     function onChangeMaxLineLength(e) {
         Options.DrawLinesInRadius = Number(e.target.value);
@@ -206,6 +215,10 @@ var Controls = (function () {
         MinParticleVelocity.value = Options.MinParticleVelocity;
         MinParticleVelocity.onchange = onChangeMinParticleVelocity;
         MinParticleVelocityValue.innerHTML = Options.MinParticleVelocity;
+
+        MaxParticleVelocity.value = Options.MaxParticleVelocity;
+        MaxParticleVelocity.onchange = onChangeMaxParticleVelocity;
+        MaxParticleVelocityValue.innerHTML = Options.MaxParticleVelocity;
 
     	MaxLineLength.value = Options.DrawLinesInRadius;
         MaxLineLength.onchange = onChangeMaxLineLength;
